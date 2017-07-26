@@ -1,12 +1,12 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const MongoClient = require('mongodb').MongoClient;
-const assert = require('assert');
+const assert = require('assert')
 
+var winston = require('winston')
 var logger = new (winston.Logger)({
   transports: [
-    new (winston.transports.Console)(),
-    new (winston.transports.File)({ filename: 'somefile.log' })
+    new (winston.transports.File)({handleExceptions: true, filename: 'ghost.log' })
   ]
 })
 
