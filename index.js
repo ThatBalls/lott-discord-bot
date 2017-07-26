@@ -3,12 +3,19 @@ const client = new Discord.Client();
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
+var logger = new (winston.Logger)({
+  transports: [
+    new (winston.transports.Console)(),
+    new (winston.transports.File)({ filename: 'somefile.log' })
+  ]
+})
+
 var url = 'mongodb://localhost:27017/lottghost';
 var gifMap = [];
 
 MongoClient.connect(url, function(err, db) {
   assert.equal(null, err);
-  console.log("Connected correctly to server");
+  logger.log('info', 'Connected correctly to server');
 
   findGifs(db, (docs) => {
     docs.forEach((doc) => {
@@ -20,7 +27,7 @@ MongoClient.connect(url, function(err, db) {
   });
 
   client.on('ready', () => {
-    console.log('I am ready!');
+    logger.log('info', 'I am ready!');
   });
 
   client.on('message', message => {
@@ -42,7 +49,7 @@ MongoClient.connect(url, function(err, db) {
       var gifName = messageParams[1];
       var gifUrl = messageParams[2];
       if (!gifMap.find((gif) => gif.name === gifName) && gifUrl) {
-        insertGif(gifName, gifUrl, db, (results) => console.log('inserted ' + gifName + ' gif'));
+        insertGif(gifName, gifUrl, db, (results) => logger.log('info', 'inserted ' + gifName + ' gif'));
         gifMap.push({
           name: gifName,
           url: gifUrl
@@ -51,7 +58,7 @@ MongoClient.connect(url, function(err, db) {
     } else if (messageContent.indexOf('!deletegif') == 0) {
       var gifName = params[1];
       gifMap.splice(gifMap.findIndex((gif) => gif.name === gifName), 1);
-      deleteGif(gifName, db, (results) => console.log('removed ' + gifName + ' gif'));
+      deleteGif(gifName, db, (results) => logger.log('info', 'removed ' + gifName + ' gif'));
     } else if (messageContent.indexOf('!listgifs') == 0) {
       var reply = "";
       gifMap.forEach((gif) => {
