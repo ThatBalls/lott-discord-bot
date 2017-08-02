@@ -4,14 +4,23 @@ const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert')
 
 const winston = require('winston')
-winston.level = 'debug'
+const tsFormat = () => (new Date()).toLocaleTimeString();
+const logger = new (winston.Logger)({
+  transports: [
+    new (winston.transports.File)({
+      filename: `../ghost.log`,
+      timestamp: tsFormat,
+      level: 'debug'
+    })
+  ]
+});
 
 var url = 'mongodb://localhost:27017/lottghost';
 var gifMap = [];
 
 MongoClient.connect(url, function(err, db) {
   assert.equal(null, err);
-  winston.info('Connected correctly to server');
+  logger.info('Connected correctly to server');
 
   findGifs(db, (docs) => {
     console.log(docs)
@@ -24,7 +33,7 @@ MongoClient.connect(url, function(err, db) {
   });
 
   client.on('ready', () => {
-    winston.info('info', 'I am ready!');
+    logger.info('info', 'I am ready!');
   });
 
   client.on('message', message => {
@@ -46,7 +55,7 @@ MongoClient.connect(url, function(err, db) {
       var gifName = messageParams[1];
       var gifUrl = messageParams[2];
       if (!gifMap.find((gif) => gif.name === gifName) && gifUrl) {
-        insertGif(gifName, gifUrl, db, (results) => winston.info('inserted ' + gifName + ' gif'));
+        insertGif(gifName, gifUrl, db, (results) => logger.info('inserted ' + gifName + ' gif'));
         gifMap.push({
           name: gifName,
           url: gifUrl
@@ -55,7 +64,7 @@ MongoClient.connect(url, function(err, db) {
     } else if (messageContent.indexOf('!deletegif') == 0) {
       var gifName = params[1];
       gifMap.splice(gifMap.findIndex((gif) => gif.name === gifName), 1);
-      deleteGif(gifName, db, (results) => winston.info('removed ' + gifName + ' gif'));
+      deleteGif(gifName, db, (results) => logger.info('removed ' + gifName + ' gif'));
     } else if (messageContent.indexOf('!listgifs') == 0) {
       var reply = "";
       gifMap.forEach((gif) => {
