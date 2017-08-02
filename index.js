@@ -33,7 +33,7 @@ MongoClient.connect(url, function(err, db) {
   });
 
   client.on('ready', () => {
-    logger.info('info', 'I am ready!');
+    logger.info('I am ready!');
   });
 
   client.on('message', message => {
