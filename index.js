@@ -11,6 +11,7 @@ MongoClient.connect(url, function(err, db) {
   console.log("Connected correctly to server");
 
   findGifs(db, (docs) => {
+    console.log(docs)
     docs.forEach((doc) => {
       gifMap.push({
         name: doc.name,
@@ -59,20 +60,24 @@ MongoClient.connect(url, function(err, db) {
       });
       message.reply(reply);
     } else if (messageContent.indexOf('!say') == 0) {
-      messageParams = message.content.split(' ');
-      if (messageParams.length === 2) {
-        message.delete();
-        message.channel.send(messageParams[1]);
-      } else if (messageParams.length === 3) {
-        message.delete();
-        var channel = message.guild.channels.array().find((channel) => channel.name === messageParams[2]);
-        channel.send(messageParams[1]);
-      } else if (messageParams.length === 4) {
-        var guild = client.guilds.array().find((guild) => guild.id === messageParams[3]);
-        var channel = guild.channels.array().find((channel) => channel.name === messageParams[2]);
-        channel.send(messageParams[1]);
+      message.delete();
+      console.log(messageContent);
+      if (messageContent.includes(" *")) {
+        var guildId = messageContent.substr(messageContent.indexOf(" *") + 2).split(' ')[0];
+        var guild = client.guilds.array().find((guild) => guild.id === guildId);
+        var channelName = message.content.substr(messageContent.indexOf(" $") + 2).split(' ')[0];
+        var channel = guild.channels.array().find((channel) => channel.name === channelName);
+        var sayText = message.content.substr(messageContent.indexOf(" ~") + 2);
+        channel.send(sayText);
+      } else if (messageContent.includes(" $")) {
+        console.log("channel say");
+        var channelName = message.content.substr(messageContent.indexOf(" $") + 2).split(' ')[0];
+        var channel = message.guild.channels.array().find((channel) => channel.name === channelName);
+        var sayText = message.content.substr(messageContent.indexOf(" ~") + 2);
+        channel.send(sayText);
+      } else {
+        message.channel.send(message.content.substr(4));
       }
-
     } else if (messageContent.indexOf('~') == 0) {
       var commandName = params[0].substr(1);
       var gifData = gifMap.find((gif) => gif.name === commandName);
@@ -80,8 +85,13 @@ MongoClient.connect(url, function(err, db) {
         message.reply(gifData.url);
       }
     }
+
     if (message.content === 'ping') {
       message.reply('pong');
+    }
+
+    if (message.content.indexOf('little light') >= 0) {
+      message.reply("Don't call me that");
     }
   });
 });
