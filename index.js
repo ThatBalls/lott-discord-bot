@@ -67,8 +67,8 @@ MongoClient.connect(url, function(err, db) {
       });
       message.reply(reply);
     } else if (messageContent.indexOf('!say') == 0) {
+      logger.log('info', "Say command: " + messageContent);
       message.delete();
-      console.log(messageContent);
       if (messageContent.includes(" *")) {
         var guildId = messageContent.substr(messageContent.indexOf(" *") + 2).split(' ')[0];
         var guild = client.guilds.array().find((guild) => guild.id === guildId);
@@ -77,7 +77,6 @@ MongoClient.connect(url, function(err, db) {
         var sayText = message.content.substr(messageContent.indexOf(" ~") + 2);
         channel.send(sayText);
       } else if (messageContent.includes(" $")) {
-        console.log("channel say");
         var channelName = message.content.substr(messageContent.indexOf(" $") + 2).split(' ')[0];
         var channel = message.guild.channels.array().find((channel) => channel.name === channelName);
         var sayText = message.content.substr(messageContent.indexOf(" ~") + 2);
