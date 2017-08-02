@@ -10,7 +10,8 @@ const logger = new (winston.Logger)({
     new (winston.transports.File)({
       filename: `../ghost.log`,
       timestamp: tsFormat,
-      level: 'debug'
+      level: 'debug',
+      json: false
     })
   ]
 });
