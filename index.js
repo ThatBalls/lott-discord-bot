@@ -135,4 +135,4 @@ var deleteGif = function(name, db, callback) {
   });
 };
 
-client.login('MjQ1NTU3Nzg5OTAzMDI4MjI0.DEgYTg.Ndgo_f5S2ZTMs3q9TGGFdn5VX6k');
+client.login('INSERT TOKEN HERE');
